@@ -1,5 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Json extends CI_Controller 
+class Json extends CI_Controller
 {
 	public function placelimitedemail()
     {
@@ -11,7 +11,7 @@ class Json extends CI_Controller
         $this->load->library('email');
         $this->email->from('lyla@lylaloves.co.uk', 'Lyla');
         $this->email->to($email);
-       
+
         $this->email->subject('Limited Stock');
         $this->email->message('<img src="http://zibacollection.co.uk/lylalovecouk/img/onformsubmit.jpg" width="560px" height="398px">');
 
@@ -31,7 +31,7 @@ class Json extends CI_Controller
     }
 	public function signupemail()
     {
-        
+
         $email=$this->input->get('email');
         $this->load->library('email');
         $this->email->from('lyla@lylaloves.co.uk', 'Lyla');
@@ -47,7 +47,7 @@ class Json extends CI_Controller
     }
 	public function orderemail()
     {
-        
+
         $email=$this->input->get('email');
         $orderid=$this->input->get('orderid');
         $this->load->library('email');
@@ -65,7 +65,7 @@ class Json extends CI_Controller
     }
 	function usercontact()
 	{
-		
+
 		$name=$this->input->get_post('name');
 		$email=$this->input->get_post('email');
 		$phone=$this->input->get_post('phone');
@@ -77,7 +77,7 @@ class Json extends CI_Controller
 	{
         $carts = json_decode(file_get_contents('php://input'), true);
         //print_r($carts['cart']);
-        
+
 		$data["message"]=$this->order_model->orderitem($carts['cart']);
 		$this->load->view("json",$data);
 	}*/
@@ -106,9 +106,9 @@ class Json extends CI_Controller
         $shippingmethod=$order['form']['shippingmethod'];
 		$carts=$order['form']['cart'];
                 $finalamount=$order['form']['finalamount'];
-        
-        
-        
+
+
+
         $data["message"]=$this->order_model->placeorder($user,$firstname,$lastname,$email,$billingaddress,$billingcity,$billingstate,$billingcountry,$shippingaddress,$shippingcity,$shippingcountry,$shippingstate,$shippingpincode,$billingpincode,$phone,$status,$company,$fax,$carts,$finalamount,$shippingmethod);
         //$data["message"]=$this->order_model->placeorder($user,$firstname,$lastname,$email,$billingaddress,$billingcity,$billingstate,$billingcountry,$shippingaddress,$shippingcity,$shippingcountry,$shippingstate,$shippingpincode,$billingpincode,$phone,$status,$company,$fax);
 		$this->load->view("json",$data);
@@ -121,7 +121,7 @@ class Json extends CI_Controller
 	}
 	function addcartsession()
 	{
-		
+
 		$cart=$this->input->get_post('cart');
 		$data["message"]=$this->order_model->addcartsession($cart);
 		$this->load->view("json",$data);
@@ -142,7 +142,7 @@ class Json extends CI_Controller
         $data["message"]=$this->user_model->destroycart();
 		$this->load->view("json",$data);
 	}
-    
+
     function showcart() {
         $cart=$this->cart->contents();
         $newcart=array();
@@ -160,7 +160,7 @@ class Json extends CI_Controller
         $data["message"]=$this->cart->total_items();
         $this->load->view("json",$data);
     }
-    
+
 	function searchbyname()
 	{
 		$search=$this->input->get_post('search');
@@ -209,8 +209,9 @@ class Json extends CI_Controller
 	}
     function loginuser()
 	{
-		$email=$this->input->get_post('email');
-		$password=$this->input->get_post('password');
+		$user = json_decode(file_get_contents('php://input'), true);
+		$email=$user['email'];
+		$password=$user['password'];
 		$data["message"]=$this->user_model->loginuser($email,$password);
 		$this->load->view("json",$data);
 	}
@@ -227,17 +228,17 @@ class Json extends CI_Controller
     }
     function deletecart() {
     	$id=intval($this->input->get_post("id"));
-    	
+
         $cart=$this->cart->contents();
         $newcart=array();
         foreach($cart as $item) {
-        
+
         	if($item['id'] != $id)
             array_push($newcart,$item);
         }
         $this->cart->destroy();
       $this->cart->insert($newcart);
-      
+
         $data["message"]=$newcart;
        $this->load->view("json",$data);
     }
@@ -292,7 +293,7 @@ class Json extends CI_Controller
 		$email=$this->input->get("email");
 		$amount=$this->input->get("amount");
 		$name=$this->input->get("name");
-		
+
 		$this->load->library( 'stripe' );
 		// Configuration options
         $config['stripe_key_test_public']         = 'pk_test_4etgLi16WbODEDr4YBFdcbP0';
@@ -307,12 +308,12 @@ class Json extends CI_Controller
 
 		// Run the required operations
 		$customer=json_decode($stripe->customer_create($token,$email));
-		
+
 		$data['message']=json_decode($stripe->charge_customer($amount,$customer->id,$name));
 		$this->load->view("json",$data);
 	}
-    
-    
+
+
     public function addimagetoproduct()
     {
         $product=$this->input->get_post("product");
@@ -322,15 +323,15 @@ class Json extends CI_Controller
         {
             $default=1;
         }
-        else 
+        else
         {
             $default=0;
         }
         $this->db->query("INSERT INTO `productimage` (`id`,`product`,`image`,`is_default`,`order`,`status`) VALUES (NULL,'$product','$image','$default','$order','0')");
         echo "Done";
-        
+
     }
-    public function nextproduct() 
+    public function nextproduct()
     {
         $id=$this->input->get_post("id");
         $next=$this->input->get_post("next");
@@ -342,18 +343,18 @@ class Json extends CI_Controller
             $orderby="DESC";
         }
         $query=$this->db->query("SELECT `id` FROM `product` WHERE `id`$sign'$id' ORDER BY `id` $orderby  LIMIT 0,1");
-        
+
         if ($query->num_rows() > 0)
         {
             $data['message']=$query->row();
 
             //return $query;
         }
-        else 
+        else
         {
             $searchstring=substr($category,1);
             $query2=$this->db->query("SELECT `id` FROM `product` ORDER BY `id` $orderby  LIMIT 0,1");
-            
+
             if($query)
             {
                 $data['message']=$query2->id;
@@ -362,30 +363,30 @@ class Json extends CI_Controller
             {
                 $data['message']=false;
             }
-            
+
         }
 
-        
+
 
         $this->load->view('json',$data);
     }
-    
+
     function getconversionrates () {
-        
+
         //$continent->name=geoip_continent_code_by_name($ip);
         $data["message"]=$this->currency_model->viewcurrency();
         $this->load->view("json",$data);
     }
-    
-    function addproductwaitinglist() 
+
+    function addproductwaitinglist()
     {
         $email=$this->input->get_post("email");
         $product=$this->input->get_post("product");
         $data["message"]=$this->product_model->addproductwaitinglist($email,$product);
         $this->load->view('json',$data);
     }
-    
-    
+
+
         public function emailcustomerdiscount()
     {
         $this->order_model->emailcustomerdiscount();
@@ -394,12 +395,12 @@ class Json extends CI_Controller
 
     function getproductbycategory()
 	{
-        
+
 		$color=$this->input->get_post("color");
 		$price1=$this->input->get_post("price1");
 		$price2=$this->input->get_post("price2");
 		$category=$this->input->get_post("category");
-        
+
 		$where = "";
 		if($price1!="")
 		{
@@ -414,81 +415,81 @@ class Json extends CI_Controller
 			$where .= " OR `category`.`parent`='$category' ";
 		$query['category']=$this->db->query("SELECT `category`.`name` ,`category`.`image1` FROM `category`
 		WHERE `category`.`id`='$category'")->row();
-        
-        
+
+
         $elements=array();
         $elements[0]=new stdClass();
         $elements[0]->field="`product`.`id`";
         $elements[0]->sort="1";
         $elements[0]->header="ID";
         $elements[0]->alias="id";
-        
+
         $elements[1]=new stdClass();
         $elements[1]->field="`product`.`name`";
         $elements[1]->sort="1";
         $elements[1]->header="Name";
         $elements[1]->alias="name";
-       
+
         $elements[2]=new stdClass();
         $elements[2]->field="`product`.`sku`";
         $elements[2]->sort="1";
         $elements[2]->header="sku";
         $elements[2]->alias="sku";
-       
+
         $elements[3]=new stdClass();
         $elements[3]->field="`product`.`url`";
         $elements[3]->sort="1";
         $elements[3]->header="url";
         $elements[3]->alias="url";
-       
+
         $elements[4]=new stdClass();
         $elements[4]->field="`product`.`price`";
         $elements[4]->sort="1";
         $elements[4]->header="price";
         $elements[4]->alias="price";
-       
+
         $elements[5]=new stdClass();
         $elements[5]->field="`product`.`wholesaleprice`";
         $elements[5]->sort="1";
         $elements[5]->header="wholesaleprice";
         $elements[5]->alias="wholesaleprice";
-       
+
         $elements[6]=new stdClass();
         $elements[6]->field="`product`.`firstsaleprice`";
         $elements[6]->sort="1";
         $elements[6]->header="firstsaleprice";
         $elements[6]->alias="firstsaleprice";
-       
+
         $elements[7]=new stdClass();
         $elements[7]->field="`product`.`secondsaleprice`";
         $elements[7]->sort="1";
         $elements[7]->header="secondsaleprice";
         $elements[7]->alias="secondsaleprice";
-       
+
         $elements[8]=new stdClass();
         $elements[8]->field="`product`.`specialpriceto`";
         $elements[8]->sort="1";
         $elements[8]->header="specialpriceto";
         $elements[8]->alias="specialpriceto";
-       
+
         $elements[9]=new stdClass();
         $elements[9]->field="`product`.`specialpricefrom`";
         $elements[9]->sort="1";
         $elements[9]->header="specialpricefrom";
         $elements[9]->alias="specialpricefrom";
-       
+
         $elements[10]=new stdClass();
         $elements[10]->field="`image1`.`image`";
         $elements[10]->sort="1";
         $elements[10]->header="image1";
         $elements[10]->alias="image1";
-       
+
         $elements[11]=new stdClass();
         $elements[11]->field="`image2`.`image`";
         $elements[11]->sort="1";
         $elements[11]->header="image2";
         $elements[11]->alias="image2";
-       
+
         $search=$this->input->get_post("search");
         $pageno=$this->input->get_post("pageno");
         $orderby=$this->input->get_post("orderby");
@@ -498,19 +499,19 @@ class Json extends CI_Controller
         {
             $maxrow=20;
         }
-        
+
         if($orderby=="")
         {
             $orderby="id";
             $orderorder="ASC";
         }
-       
+
         $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `product` INNER JOIN `productcategory` ON `product`.`id`=`productcategory`.`product` INNER JOIN `category` ON `category`.`id`=`productcategory`.`category` LEFT OUTER JOIN `productimage` as `image2` ON `image2`.`product`=`product`.`id` AND `image2`.`order`=0 LEFT OUTER JOIN `productimage` as `image1` ON `image1`.`product`=`product`.`id` AND `image1`.`order`=1","WHERE `product`.`visibility`=1 AND `product`.`status`=1 AND `product`.`quantity` > 0 AND `product`.`name` LIKE '%$color%' $pricefilter AND (   `productcategory`.`category`=$category $where )");
-        
+
 		$this->load->view("json",$data);
-	} 
-    
-    
-    
+	}
+
+
+
 }
 ?>
