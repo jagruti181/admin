@@ -59,9 +59,9 @@ $active_record = TRUE;
 
 // Testing (local) DB settings
 $db['testing']['hostname'] = 'localhost';
-$db['testing']['username'] = 'wohligco_lyl';
-$db['testing']['password'] = 'chintan123!@#';
-$db['testing']['database'] = 'wohligco_lyl';
+$db['testing']['username'] = 'root';
+$db['testing']['password'] = '';
+$db['testing']['database'] = 'magicmirror';
 $db['testing']['dbdriver'] = 'mysql';
 $db['testing']['dbprefix'] = '';
 $db['testing']['pconnect'] = TRUE;
